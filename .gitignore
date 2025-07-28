@@ -1,0 +1,11 @@
+# object files & executable
+*.o
+mnist
+
+# CUDA visual profiler / Nsight traces
+*.nvvp
+*.nsys-rep
+
+# Editor noise
+*~
+.vscode/
