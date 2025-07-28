@@ -11,6 +11,9 @@
  #include <cudnn.h>
  #include "mnist.h"
  #include "utils.h"
+
+
+ void relu_forward_cuda(float *d_x, int n);
  
  /* ---------------- Tensor allocation helpers ------------------------- */
  void tensor_malloc(tensor_t *t)
@@ -113,10 +116,10 @@
      const float alpha = 1.0f, beta = 0.0f;
      size_t ws_bytes = 0;
      void *ws = NULL;
-     cudnnConvolutionFwdAlgo_t algo;
-     cudnnGetConvolutionForwardAlgorithm(g_cudnn,
-         x_desc, c1_filt_desc, conv1_desc, c1_out_desc,
-         CUDNN_CONVOLUTION_FWD_PREFER_FASTEST, 0, &algo);
+    /* cuDNN 9 removed the old 'preference' API. 
+       We use a safe default that needs moderate workspace. */ 
+     cudnnConvolutionFwdAlgo_t algo = 
+        CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM;
      cudnnGetConvolutionForwardWorkspaceSize(g_cudnn,
          x_desc, c1_filt_desc, conv1_desc, c1_out_desc,
          algo, &ws_bytes);
@@ -289,3 +292,4 @@
  
  /* Call once at program exit. */
  void layers_shutdown(void) { destroy_descriptors(); }
+ 
